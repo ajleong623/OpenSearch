@@ -304,6 +304,10 @@ public abstract class ValuesSource {
                 return indexFieldData.load(context).getBytesValues();
             }
 
+            public String getIndexFieldName() {
+                return this.indexFieldData.getFieldName();
+            }
+
         }
 
         /**
