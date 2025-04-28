@@ -632,8 +632,12 @@ public class RareTermsAggregatorTests extends AggregatorTestCase {
         }
     }
 
-    private <A extends InternalAggregation> A executeTestCaseIndexString(Query query, List<Long> dataset, AggregationBuilder aggregationBuilder, boolean shouldIndex)
-        throws IOException {
+    private <A extends InternalAggregation> A executeTestCaseIndexString(
+        Query query,
+        List<Long> dataset,
+        AggregationBuilder aggregationBuilder,
+        boolean shouldIndex
+    ) throws IOException {
         try (Directory directory = newDirectory()) {
             try (RandomIndexWriter indexWriter = new RandomIndexWriter(random(), directory)) {
                 Document document = new Document();

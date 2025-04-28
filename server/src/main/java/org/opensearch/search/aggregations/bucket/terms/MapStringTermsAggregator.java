@@ -130,7 +130,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         this.includeExclude = includeExclude;
         bucketOrds = BytesKeyedBucketOrds.build(context.bigArrays(), cardinality);
         if (collectorSource instanceof ValuesSourceCollectorSource) {
-            ValuesSource valuesCollectorSource = ((ValuesSourceCollectorSource) collectorSource).getValuesSource(); 
+            ValuesSource valuesCollectorSource = ((ValuesSourceCollectorSource) collectorSource).getValuesSource();
             if (valuesCollectorSource instanceof ValuesSource.Bytes.FieldData) {
                 this.fieldName = ((ValuesSource.Bytes.FieldData) valuesCollectorSource).getIndexFieldName();
             } else {
@@ -182,8 +182,8 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
             return false;
         }
 
-        // The optimization could only be used if there are no deleted documents and the top-level 
-        // query matches all documents in the segment. 
+        // The optimization could only be used if there are no deleted documents and the top-level
+        // query matches all documents in the segment.
         if (weight == null) {
             return false;
         } else {
@@ -203,7 +203,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         TermsEnum stringTermsEnum = stringTerms.iterator();
         BytesRef stringTerm = stringTermsEnum.next();
 
-        // Here, we will iterate over all the terms in the segment and add the counts into the bucket. 
+        // Here, we will iterate over all the terms in the segment and add the counts into the bucket.
         while (stringTerm != null) {
             long bucketOrdinal = bucketOrds.add(0L, stringTerm);
             if (bucketOrdinal < 0) { // already seen
@@ -211,7 +211,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
             }
             int amount = stringTermsEnum.docFreq();
             if (resultStrategy instanceof SignificantTermsResults) {
-                ((SignificantTermsResults)resultStrategy).updateSubsetSizes(0L, amount);
+                ((SignificantTermsResults) resultStrategy).updateSubsetSizes(0L, amount);
             }
             incrementBucketDocCount(bucketOrdinal, amount);
             stringTerm = stringTermsEnum.next();

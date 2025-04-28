@@ -142,8 +142,8 @@ public class StringRareTermsAggregator extends AbstractRareTermsAggregator {
             return false;
         }
 
-        // The optimization could only be used if there are no deleted documents and the top-level 
-        // query matches all documents in the segment. 
+        // The optimization could only be used if there are no deleted documents and the top-level
+        // query matches all documents in the segment.
         if (weight == null) {
             return false;
         } else {
@@ -163,7 +163,7 @@ public class StringRareTermsAggregator extends AbstractRareTermsAggregator {
         TermsEnum stringTermsEnum = stringTerms.iterator();
         BytesRef stringTerm = stringTermsEnum.next();
 
-        // Here, we will iterate over all the terms in the segment and add the counts into the bucket. 
+        // Here, we will iterate over all the terms in the segment and add the counts into the bucket.
         while (stringTerm != null) {
             long bucketOrdinal = bucketOrds.add(0L, stringTerm);
             if (bucketOrdinal < 0) { // already seen
