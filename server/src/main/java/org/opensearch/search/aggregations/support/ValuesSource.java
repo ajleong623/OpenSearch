@@ -69,11 +69,11 @@ import org.opensearch.search.aggregations.support.values.ScriptBytesValues;
 import org.opensearch.search.aggregations.support.values.ScriptDoubleValues;
 import org.opensearch.search.aggregations.support.values.ScriptLongValues;
 
-import static java.util.Collections.sort;
-
 import java.io.IOException;
 import java.util.function.Function;
 import java.util.function.LongUnaryOperator;
+
+import static java.util.Collections.sort;
 
 /**
  * Base class for a ValuesSource; the primitive data for an agg

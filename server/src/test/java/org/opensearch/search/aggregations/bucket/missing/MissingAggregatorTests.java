@@ -105,8 +105,8 @@ public class MissingAggregatorTests extends AggregatorTestCase {
             assertEquals(0, internalMissing.getDocCount());
             assertFalse(AggregationInspectionHelper.hasValue(internalMissing));
         }, singleton(fieldType));
-        
-        // Running the same test but while indexing the field name. Because this is the 
+
+        // Running the same test but while indexing the field name. Because this is the
         // only way to precompute the aggregation.
         testCase(newMatchAllQuery(), builder, writer -> {
             for (int i = 0; i < numDocs; i++) {
@@ -141,7 +141,7 @@ public class MissingAggregatorTests extends AggregatorTestCase {
             assertTrue(AggregationInspectionHelper.hasValue(internalMissing));
         }, List.of(aggFieldType, anotherFieldType));
 
-        // Running the same test but while indexing the field name. Because this is the 
+        // Running the same test but while indexing the field name. Because this is the
         // only way to precompute the aggregation.
         testCase(newMatchAllQuery(), builder, writer -> {
             for (int i = 0; i < numDocs; i++) {
