@@ -69,6 +69,8 @@ import org.opensearch.search.aggregations.support.values.ScriptBytesValues;
 import org.opensearch.search.aggregations.support.values.ScriptDoubleValues;
 import org.opensearch.search.aggregations.support.values.ScriptLongValues;
 
+import static java.util.Collections.sort;
+
 import java.io.IOException;
 import java.util.function.Function;
 import java.util.function.LongUnaryOperator;
@@ -120,6 +122,10 @@ public abstract class ValuesSource {
         public Range(IndexFieldData<?> indexFieldData, RangeType rangeType) {
             this.indexFieldData = indexFieldData;
             this.rangeType = rangeType;
+        }
+
+        public String getIndexFieldName() {
+            return this.indexFieldData.getFieldName();
         }
 
         @Override
