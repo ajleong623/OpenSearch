@@ -372,7 +372,7 @@ public class MissingAggregatorTests extends AggregatorTestCase {
             assertEquals(0, internalMissingAgg.getDocCount());
             assertFalse(AggregationInspectionHelper.hasValue(internalMissingAgg));
 
-            // Having the missing parameter will make the missing aggregator not responsible for any documents, so it will short circuit
+            // Having the missing parameter will make the missing aggregator not responsible for any documents, so it will short-circuit
             assertEquals(0, internalMissing.getCount());
         }, List.of(aggFieldType, anotherFieldType));
     }
