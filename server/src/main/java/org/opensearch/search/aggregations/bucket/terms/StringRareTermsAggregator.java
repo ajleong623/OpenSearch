@@ -88,9 +88,7 @@ public class StringRareTermsAggregator extends AbstractRareTermsAggregator {
         this.valuesSource = valuesSource;
         this.filter = filter;
         this.bucketOrds = BytesKeyedBucketOrds.build(context.bigArrays(), cardinality);
-        this.fieldName = (valuesSource instanceof ValuesSource.Bytes.WithOrdinals.FieldData)
-            ? ((ValuesSource.Bytes.WithOrdinals.FieldData) valuesSource).getIndexFieldName()
-            : null;
+        this.fieldName = valuesSource.getIndexFieldName();
     }
 
     public void setWeight(Weight weight) {

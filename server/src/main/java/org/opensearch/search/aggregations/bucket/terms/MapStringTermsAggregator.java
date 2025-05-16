@@ -31,7 +31,9 @@
 
 package org.opensearch.search.aggregations.bucket.terms;
 
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.ScoreMode;
@@ -43,6 +45,7 @@ import org.opensearch.common.lease.Releasable;
 import org.opensearch.common.lease.Releasables;
 import org.opensearch.common.util.LongArray;
 import org.opensearch.index.fielddata.SortedBinaryDocValues;
+import org.opensearch.index.mapper.DocCountFieldMapper;
 import org.opensearch.search.DocValueFormat;
 import org.opensearch.search.aggregations.Aggregator;
 import org.opensearch.search.aggregations.AggregatorFactories;
@@ -68,6 +71,8 @@ import java.util.function.LongConsumer;
 import java.util.function.Supplier;
 
 import static org.opensearch.search.aggregations.InternalOrder.isKeyOrder;
+import static org.apache.lucene.index.SortedSetDocValues.NO_MORE_DOCS;
+import static org.apache.lucene.search.DocIdSetIterator.NO_MORE_DOCS;
 
 /**
  * An aggregator of string values that hashes the strings on the fly rather
@@ -131,11 +136,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         bucketOrds = BytesKeyedBucketOrds.build(context.bigArrays(), cardinality);
         if (collectorSource instanceof ValuesSourceCollectorSource) {
             ValuesSource valuesCollectorSource = ((ValuesSourceCollectorSource) collectorSource).getValuesSource();
-            if (valuesCollectorSource instanceof ValuesSource.Bytes.FieldData) {
-                this.fieldName = ((ValuesSource.Bytes.FieldData) valuesCollectorSource).getIndexFieldName();
-            } else {
-                this.fieldName = null;
-            }
+            this.fieldName = valuesCollectorSource.getIndexFieldName();
         } else {
             this.fieldName = null;
         }
@@ -197,6 +198,12 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         Terms stringTerms = ctx.reader().terms(fieldName);
         if (stringTerms == null) {
             // Field is not indexed.
+            return false;
+        }
+
+        NumericDocValues docCountValues = DocValues.getNumeric(ctx.reader(), DocCountFieldMapper.NAME);
+        if (docCountValues.nextDoc() != NO_MORE_DOCS) {
+            // This segment has at least one document with the _doc_count field.
             return false;
         }
 
