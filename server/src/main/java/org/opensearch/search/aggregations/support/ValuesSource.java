@@ -110,6 +110,10 @@ public abstract class ValuesSource {
         return false;
     }
 
+    public String getIndexFieldName() {
+        return null;
+    }
+
     /**
      * Range type
      *
@@ -124,6 +128,7 @@ public abstract class ValuesSource {
             this.rangeType = rangeType;
         }
 
+        @Override
         public String getIndexFieldName() {
             return this.indexFieldData.getFieldName();
         }
@@ -250,6 +255,7 @@ public abstract class ValuesSource {
                     this.indexFieldData = indexFieldData;
                 }
 
+                @Override
                 public String getIndexFieldName() {
                     return this.indexFieldData.getFieldName();
                 }
@@ -310,6 +316,7 @@ public abstract class ValuesSource {
                 return indexFieldData.load(context).getBytesValues();
             }
 
+            @Override
             public String getIndexFieldName() {
                 return this.indexFieldData.getFieldName();
             }
@@ -354,6 +361,11 @@ public abstract class ValuesSource {
             public WithScript(ValuesSource delegate, AggregationScript.LeafFactory script) {
                 this.delegate = delegate;
                 this.script = script;
+            }
+
+            @Override
+            public String getIndexFieldName() {
+                return delegate.getIndexFieldName();
             }
 
             @Override
@@ -636,6 +648,7 @@ public abstract class ValuesSource {
                 return indexFieldData.load(context).getDoubleValues();
             }
 
+            @Override
             public String getIndexFieldName() {
                 return indexFieldData.getFieldName();
             }
@@ -736,6 +749,11 @@ public abstract class ValuesSource {
             }
 
             @Override
+            public String getIndexFieldName() {
+                return indexFieldData.getFieldName();
+            }
+
+            @Override
             public SortedBinaryDocValues bytesValues(LeafReaderContext context) {
                 return indexFieldData.load(context).getBytesValues();
             }
@@ -805,6 +823,11 @@ public abstract class ValuesSource {
 
             public FieldData(AbstractGeoShapeIndexFieldData indexFieldData) {
                 this.indexFieldData = indexFieldData;
+            }
+
+            @Override
+            public String getIndexFieldName() {
+                return indexFieldData.getFieldName();
             }
 
             /**
