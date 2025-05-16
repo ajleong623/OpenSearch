@@ -819,6 +819,8 @@ public abstract class AggregatorTestCase extends OpenSearchTestCase {
      * Half the time it aggregates each leaf individually and reduces all
      * results together. The other half the time it aggregates across the entire
      * index at once and runs a final reduction on the single resulting agg.
+     * A count of the number of collect operations will be returned with the
+     * agg.
      */
     protected <A extends InternalAggregation, C extends Aggregator> CompositeAggregationAndCount searchAndReduceCounting(
         IndexSettings indexSettings,
