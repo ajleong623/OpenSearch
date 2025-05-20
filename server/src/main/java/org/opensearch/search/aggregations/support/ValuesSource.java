@@ -364,11 +364,6 @@ public abstract class ValuesSource {
             }
 
             @Override
-            public String getIndexFieldName() {
-                return delegate.getIndexFieldName();
-            }
-
-            @Override
             public boolean needsScores() {
                 return script.needs_score();
             }
