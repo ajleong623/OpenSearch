@@ -186,12 +186,17 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         // TODO: A note is that in scripted aggregations, the way of collecting from buckets is determined from
         // the script aggregator. For now, we will not be able to support the script aggregation.
 
-        // TODO: Make sure to take into account the possibility of a missing field as seen in the
-        // GlobalOrdinalsStringTermsAggregator
-
         if (subAggregators.length > 0 || includeExclude != null || fieldName == null) {
             // The optimization does not work when there are subaggregations or if there is a filter.
             // The query has to be a match all, otherwise
+            return false;
+        }
+
+        // If the missing property is specified in the builder, and there are documents with the
+        // field missing, we might not be able to use the index unless there is a way to
+        // calculate which ordinal value that missing field is (something I am not sure how to
+        // do yet).
+        if (config != null && config.missing() != null && ((weight.count(ctx) == ctx.reader().getDocCount(fieldName)) == false)) {
             return false;
         }
 

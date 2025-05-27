@@ -195,6 +195,14 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
             }
         }
 
+        // If the missing property is specified in the builder, and there are documents with the
+        // field missing, we might not be able to use the index unless there is a way to
+        // calculate which ordinal value that missing field is (something I am not sure how to
+        // do yet).
+        if (config != null && config.missing() != null && ((weight.count(ctx) == ctx.reader().getDocCount(fieldName)) == false)) {
+            return false;
+        }
+
         Terms segmentTerms = ctx.reader().terms(this.fieldName);
         if (segmentTerms == null) {
             // Field is not indexed.
@@ -226,25 +234,6 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
             } else if (compare < 0) {
                 indexTerm = indexTermsEnum.next();
             } else {
-                if (config != null && config.missing() != null) {
-                    int commonLength = Math.min(ordinalTerm.bytes.length, ((String) config.missing()).getBytes().length);
-                    byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
-                    byte[] missingFieldBytes = Arrays.copyOf(((String) config.missing()).getBytes(), commonLength);
-                    if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
-                        ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
-                    }
-                }
-                ordinalTerm = globalOrdinalTermsEnum.next();
-            }
-        }
-        if (config != null && config.missing() != null) {
-            while (ordinalTerm != null) {
-                int commonLength = Math.min(ordinalTerm.bytes.length, ((String) config.missing()).getBytes().length);
-                byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
-                byte[] missingFieldBytes = Arrays.copyOf(((String) config.missing()).getBytes(), commonLength);
-                if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
-                    ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
-                }
                 ordinalTerm = globalOrdinalTermsEnum.next();
             }
         }
