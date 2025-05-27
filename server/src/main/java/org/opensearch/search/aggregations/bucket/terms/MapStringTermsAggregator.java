@@ -186,7 +186,8 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         // TODO: A note is that in scripted aggregations, the way of collecting from buckets is determined from
         // the script aggregator. For now, we will not be able to support the script aggregation.
 
-        //TODO: Make sure to take into account the possibility of a missing field as seen in the GlobalOrdinalsStringTermsAggregator
+        //TODO: Make sure to take into account the possibility of a missing field as seen in the 
+        //GlobalOrdinalsStringTermsAggregator
 
         if (subAggregators.length > 0 || includeExclude != null || fieldName == null) {
             // The optimization does not work when there are subaggregations or if there is a filter.
