@@ -193,7 +193,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         }
 
         // If the missing property is specified in the builder, and there are documents with the
-        // field missing, we might not be able to use the index unless there is a way to
+        // field missing, we might not be able to use the index unless there is a way we can
         // calculate which ordinal value that missing field is (something I am not sure how to
         // do yet).
         if (config != null && config.missing() != null && ((weight.count(ctx) == ctx.reader().getDocCount(fieldName)) == false)) {
