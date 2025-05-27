@@ -60,6 +60,7 @@ import org.opensearch.search.aggregations.bucket.LocalBucketCountThresholds;
 import org.opensearch.search.aggregations.bucket.terms.SignificanceLookup.BackgroundFrequencyForBytes;
 import org.opensearch.search.aggregations.bucket.terms.heuristic.SignificanceHeuristic;
 import org.opensearch.search.aggregations.support.ValuesSource;
+import org.opensearch.search.aggregations.support.ValuesSourceConfig;
 import org.opensearch.search.internal.SearchContext;
 
 import java.io.IOException;
@@ -87,6 +88,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
     private final BytesKeyedBucketOrds bucketOrds;
     private final IncludeExclude.StringFilter includeExclude;
     protected final String fieldName;
+    private final ValuesSourceConfig config;
 
     public MapStringTermsAggregator(
         String name,
@@ -103,7 +105,8 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         boolean showTermDocCountError,
         CardinalityUpperBound cardinality,
         Map<String, Object> metadata,
-        String fieldName
+        String fieldName,
+        ValuesSourceConfig config
     ) throws IOException {
         super(name, factories, context, parent, order, format, bucketCountThresholds, collectionMode, showTermDocCountError, metadata);
         this.collectorSource = collectorSource;
@@ -111,6 +114,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         this.includeExclude = includeExclude;
         bucketOrds = BytesKeyedBucketOrds.build(context.bigArrays(), cardinality);
         this.fieldName = fieldName;
+        this.config = config;
     }
 
     public MapStringTermsAggregator(
@@ -127,7 +131,8 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         SubAggCollectionMode collectionMode,
         boolean showTermDocCountError,
         CardinalityUpperBound cardinality,
-        Map<String, Object> metadata
+        Map<String, Object> metadata,
+        ValuesSourceConfig config
     ) throws IOException {
         super(name, factories, context, parent, order, format, bucketCountThresholds, collectionMode, showTermDocCountError, metadata);
         this.collectorSource = collectorSource;
@@ -140,6 +145,7 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
         } else {
             this.fieldName = null;
         }
+        this.config = config;
     }
 
     public void setWeight(Weight weight) {
@@ -179,6 +185,8 @@ public class MapStringTermsAggregator extends AbstractStringTermsAggregator {
     protected boolean tryPrecomputeAggregationForLeaf(LeafReaderContext ctx) throws IOException {
         // TODO: A note is that in scripted aggregations, the way of collecting from buckets is determined from
         // the script aggregator. For now, we will not be able to support the script aggregation.
+
+        //TODO: Make sure to take into account the possibility of a missing field as seen in the GlobalOrdinalsStringTermsAggregator
 
         if (subAggregators.length > 0 || includeExclude != null || fieldName == null) {
             // The optimization does not work when there are subaggregations or if there is a filter.

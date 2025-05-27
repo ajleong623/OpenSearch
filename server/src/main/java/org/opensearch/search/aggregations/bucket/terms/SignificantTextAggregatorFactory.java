@@ -169,7 +169,8 @@ public class SignificantTextAggregatorFactory extends AggregatorFactory {
             false,
             cardinality,
             metadata,
-            indexedFieldName
+            indexedFieldName,
+            null
         );
     }
 

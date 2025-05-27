@@ -73,6 +73,7 @@ import org.opensearch.search.aggregations.bucket.LocalBucketCountThresholds;
 import org.opensearch.search.aggregations.bucket.terms.SignificanceLookup.BackgroundFrequencyForBytes;
 import org.opensearch.search.aggregations.bucket.terms.heuristic.SignificanceHeuristic;
 import org.opensearch.search.aggregations.support.ValuesSource;
+import org.opensearch.search.aggregations.support.ValuesSourceConfig;
 import org.opensearch.search.internal.SearchContext;
 import org.opensearch.search.startree.StarTreeQueryHelper;
 import org.opensearch.search.startree.StarTreeTraversalUtil;
@@ -108,6 +109,7 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
     protected int segmentsWithSingleValuedOrds = 0;
     protected int segmentsWithMultiValuedOrds = 0;
     LongUnaryOperator globalOperator;
+    private final ValuesSourceConfig config;
 
     /**
      * Lookup global ordinals
@@ -133,7 +135,8 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
         SubAggCollectionMode collectionMode,
         boolean showTermDocCountError,
         CardinalityUpperBound cardinality,
-        Map<String, Object> metadata
+        Map<String, Object> metadata,
+        ValuesSourceConfig config
     ) throws IOException {
         super(name, factories, context, parent, order, format, bucketCountThresholds, collectionMode, showTermDocCountError, metadata);
         this.resultStrategy = resultStrategy.apply(this); // ResultStrategy needs a reference to the Aggregator to do its job.
@@ -155,6 +158,7 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
             });
         }
         this.fieldName = valuesSource.getIndexFieldName();
+        this.config = config;
     }
 
     String descriptCollectionStrategy() {
@@ -222,6 +226,25 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
             } else if (compare < 0) {
                 indexTerm = indexTermsEnum.next();
             } else {
+                if (config != null && config.missing() != null) {
+                    int commonLength = Math.min(ordinalTerm.bytes.length, ((String)config.missing()).getBytes().length);
+                    byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
+                    byte[] missingFieldBytes = Arrays.copyOf(((String)config.missing()).getBytes(), commonLength);
+                    if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
+                        ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
+                    }
+                }
+                ordinalTerm = globalOrdinalTermsEnum.next();
+            }
+        }
+        if (config != null && config.missing() != null) {
+            while (ordinalTerm != null) {
+                int commonLength = Math.min(ordinalTerm.bytes.length, ((String)config.missing()).getBytes().length);
+                byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
+                byte[] missingFieldBytes = Arrays.copyOf(((String)config.missing()).getBytes(), commonLength);
+                if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
+                    ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
+                }
                 ordinalTerm = globalOrdinalTermsEnum.next();
             }
         }
@@ -480,7 +503,8 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
             boolean remapGlobalOrds,
             SubAggCollectionMode collectionMode,
             boolean showTermDocCountError,
-            Map<String, Object> metadata
+            Map<String, Object> metadata,
+            ValuesSourceConfig config
         ) throws IOException {
             super(
                 name,
@@ -497,7 +521,8 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
                 collectionMode,
                 showTermDocCountError,
                 CardinalityUpperBound.ONE,
-                metadata
+                metadata,
+                config
             );
             assert factories == null || factories.countAggregators() == 0;
             this.segmentDocCounts = context.bigArrays().newLongArray(1, true);
