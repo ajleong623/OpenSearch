@@ -227,9 +227,9 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
                 indexTerm = indexTermsEnum.next();
             } else {
                 if (config != null && config.missing() != null) {
-                    int commonLength = Math.min(ordinalTerm.bytes.length, ((String)config.missing()).getBytes().length);
+                    int commonLength = Math.min(ordinalTerm.bytes.length, ((String) config.missing()).getBytes().length);
                     byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
-                    byte[] missingFieldBytes = Arrays.copyOf(((String)config.missing()).getBytes(), commonLength);
+                    byte[] missingFieldBytes = Arrays.copyOf(((String) config.missing()).getBytes(), commonLength);
                     if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
                         ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
                     }
@@ -239,9 +239,9 @@ public class GlobalOrdinalsStringTermsAggregator extends AbstractStringTermsAggr
         }
         if (config != null && config.missing() != null) {
             while (ordinalTerm != null) {
-                int commonLength = Math.min(ordinalTerm.bytes.length, ((String)config.missing()).getBytes().length);
+                int commonLength = Math.min(ordinalTerm.bytes.length, ((String) config.missing()).getBytes().length);
                 byte[] ordinalFieldBytes = Arrays.copyOf(ordinalTerm.bytes, commonLength);
-                byte[] missingFieldBytes = Arrays.copyOf(((String)config.missing()).getBytes(), commonLength);
+                byte[] missingFieldBytes = Arrays.copyOf(((String) config.missing()).getBytes(), commonLength);
                 if (Arrays.equals(ordinalFieldBytes, missingFieldBytes)) {
                     ordCountConsumer.accept(globalOrdinalTermsEnum.ord(), weight.count(ctx) - ctx.reader().getDocCount(fieldName));
                 }
